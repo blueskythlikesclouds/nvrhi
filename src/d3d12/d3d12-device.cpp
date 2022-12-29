@@ -88,7 +88,6 @@ namespace nvrhi::d3d12
         : m_Resources(m_Context, desc)
     {
         m_Context.device = desc.pDevice;
-        m_Context.messageCallback = desc.errorCB;
 
         if (desc.pGraphicsCommandQueue)
             m_Queues[int(CommandQueue::Graphics)] = std::make_unique<Queue>(m_Context, desc.pGraphicsCommandQueue);
@@ -96,6 +95,9 @@ namespace nvrhi::d3d12
             m_Queues[int(CommandQueue::Compute)] = std::make_unique<Queue>(m_Context, desc.pComputeCommandQueue);
         if (desc.pCopyCommandQueue)
             m_Queues[int(CommandQueue::Copy)] = std::make_unique<Queue>(m_Context, desc.pCopyCommandQueue);
+
+        m_Context.messageCallback = desc.messageCallback;
+        m_Context.memoryAllocator = desc.memoryAllocator;
 
         m_Resources.depthStencilViewHeap.allocateResources(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, desc.depthStencilViewHeapSize, false);
         m_Resources.renderTargetViewHeap.allocateResources(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, desc.renderTargetViewHeapSize, false);

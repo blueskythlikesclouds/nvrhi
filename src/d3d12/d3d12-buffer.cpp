@@ -114,18 +114,34 @@ namespace nvrhi::d3d12
                 break;
         }
 
-        HRESULT res = m_Context.device->CreateCommittedResource(
-            &heapProps,
-            heapFlags,
-            &resourceDesc,
-            initialState,
-            nullptr,
-            IID_PPV_ARGS(&buffer->resource));
+        HRESULT res;
+
+        if (m_Context.memoryAllocator != nullptr)
+        {
+            res = m_Context.memoryAllocator->createResource(
+                &heapProps,
+                heapFlags,
+                &resourceDesc,
+                initialState,
+                nullptr,
+                IID_PPV_ARGS(&buffer->resource),
+                &buffer->allocation);
+        }
+        else
+        {
+            res = m_Context.device->CreateCommittedResource(
+                &heapProps,
+                heapFlags,
+                &resourceDesc,
+                initialState,
+                nullptr,
+                IID_PPV_ARGS(&buffer->resource));
+        }
 
         if (FAILED(res))
         {
             std::stringstream ss;
-            ss << "CreateCommittedResource call failed for buffer " << utils::DebugNameToString(d.debugName)
+            ss << "Resource creation failed for buffer " << utils::DebugNameToString(d.debugName)
                 << ", HRESULT = 0x" << std::hex << std::setw(8) << res;
             m_Context.error(ss.str());
 

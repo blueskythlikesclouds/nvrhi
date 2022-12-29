@@ -104,13 +104,38 @@ namespace nvrhi::d3d12
 
     typedef RefCountPtr<IDevice> DeviceHandle;
 
+    class IMemoryAllocator 
+    {
+    protected:
+        IMemoryAllocator() = default;
+        virtual ~IMemoryAllocator() = default;
+
+    public:
+        virtual HRESULT createResource(
+            const D3D12_HEAP_PROPERTIES* heapProperties,
+            D3D12_HEAP_FLAGS heapFlags,
+            const D3D12_RESOURCE_DESC* desc,
+            D3D12_RESOURCE_STATES initialResourceState,
+            const D3D12_CLEAR_VALUE* optimizedClearValue,
+            REFIID riid,
+            void** resource,
+            IUnknown** allocation) = 0;
+
+        IMemoryAllocator(const IMemoryAllocator&) = delete;
+        IMemoryAllocator(const IMemoryAllocator&&) = delete;
+        IMemoryAllocator& operator=(const IMemoryAllocator&) = delete;
+        IMemoryAllocator& operator=(const IMemoryAllocator&&) = delete;
+    };
+
     struct DeviceDesc
     {
-        IMessageCallback* errorCB = nullptr;
         ID3D12Device* pDevice = nullptr;
         ID3D12CommandQueue* pGraphicsCommandQueue = nullptr;
         ID3D12CommandQueue* pComputeCommandQueue = nullptr;
         ID3D12CommandQueue* pCopyCommandQueue = nullptr;
+
+        IMessageCallback* messageCallback = nullptr;
+        IMemoryAllocator* memoryAllocator = nullptr;
 
         uint32_t renderTargetViewHeapSize = 1024;
         uint32_t depthStencilViewHeapSize = 1024;

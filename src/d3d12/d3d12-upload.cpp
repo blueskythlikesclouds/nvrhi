@@ -66,13 +66,29 @@ namespace nvrhi::d3d12
         bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
         if (m_IsScratchBuffer) bufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 
-        HRESULT hr = m_Context.device->CreateCommittedResource(
-            &heapProps,
-            D3D12_HEAP_FLAG_NONE,
-            &bufferDesc,
-            m_IsScratchBuffer ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&chunk->buffer));
+        HRESULT hr;
+
+        if (m_Context.memoryAllocator != nullptr)
+        {
+            hr = m_Context.memoryAllocator->createResource(
+                &heapProps,
+                D3D12_HEAP_FLAG_NONE,
+                &bufferDesc,
+                m_IsScratchBuffer ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&chunk->buffer),
+                &chunk->allocation);
+        }
+        else
+        {
+            hr = m_Context.device->CreateCommittedResource(
+                &heapProps,
+                D3D12_HEAP_FLAG_NONE,
+                &bufferDesc,
+                m_IsScratchBuffer ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&chunk->buffer));
+        }
 
         if (FAILED(hr))
             return nullptr;

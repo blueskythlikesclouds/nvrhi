@@ -97,6 +97,8 @@ namespace nvrhi::d3d12
         RefCountPtr<Buffer> timerQueryResolveBuffer;
 
         IMessageCallback* messageCallback = nullptr;
+        IMemoryAllocator* memoryAllocator = nullptr;
+
         void error(const std::string& message) const;
     };
 
@@ -219,6 +221,7 @@ namespace nvrhi::d3d12
         const TextureDesc desc;
         const D3D12_RESOURCE_DESC resourceDesc;
         RefCountPtr<ID3D12Resource> resource;
+        RefCountPtr<IUnknown> allocation;
         uint8_t planeCount = 1;
         HeapHandle heap;
 
@@ -262,6 +265,7 @@ namespace nvrhi::d3d12
     public:
         const BufferDesc desc;
         RefCountPtr<ID3D12Resource> resource;
+        RefCountPtr<IUnknown> allocation;
         D3D12_GPU_VIRTUAL_ADDRESS gpuVA{};
         D3D12_RESOURCE_DESC resourceDesc{};
 
@@ -620,6 +624,7 @@ namespace nvrhi::d3d12
         static const uint64_t c_sizeAlignment = 4096; // GPU page size
 
         RefCountPtr<ID3D12Resource> buffer;
+        RefCountPtr<IUnknown> allocation;
         uint64_t version = 0;
         uint64_t bufferSize = 0;
         uint64_t writePointer = 0;

@@ -315,13 +315,29 @@ namespace nvrhi::d3d12
 
         D3D12_CLEAR_VALUE clearValue = convertTextureClearValue(d);
 
-        HRESULT hr = m_Context.device->CreateCommittedResource(
-            &heapProps,
-            heapFlags,
-            &texture->resourceDesc,
-            convertResourceStates(d.initialState),
-            d.useClearValue ? &clearValue : nullptr,
-            IID_PPV_ARGS(&texture->resource));
+        HRESULT hr;
+
+        if (m_Context.memoryAllocator != nullptr)
+        {
+            hr = m_Context.memoryAllocator->createResource(
+                &heapProps,
+                heapFlags,
+                &texture->resourceDesc,
+                convertResourceStates(d.initialState),
+                d.useClearValue ? &clearValue : nullptr,
+                IID_PPV_ARGS(&texture->resource),
+                &texture->allocation);
+        }
+        else
+        {
+            hr = m_Context.device->CreateCommittedResource(
+                &heapProps,
+                heapFlags,
+                &texture->resourceDesc,
+                convertResourceStates(d.initialState),
+                d.useClearValue ? &clearValue : nullptr,
+                IID_PPV_ARGS(&texture->resource));
+        }
 
         if (FAILED(hr))
         {
