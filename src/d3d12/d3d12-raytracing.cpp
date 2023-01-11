@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <list>
 #include <sstream>
+#include <malloc.h>
 
 namespace nvrhi::d3d12
 {
